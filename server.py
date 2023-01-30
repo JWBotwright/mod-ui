@@ -29,7 +29,7 @@ def create_dummy_credentials():
             print('Can\'t create a device key: {0}'.format(ex))
 
 ROOT = os.path.dirname(os.path.realpath(__file__))
-DATA_DIR = join(ROOT, 'data')
+DATA_DIR = join(os.environ['HOME'], '.mod-ui/data')
 os.makedirs(DATA_DIR, exist_ok=True)
 
 os.environ['MOD_DEV_ENVIRONMENT'] = os.environ.get("MOD_DEV_ENVIRONMENT", '1')
