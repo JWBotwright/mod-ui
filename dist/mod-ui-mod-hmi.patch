@@ -1,7 +1,7 @@
---- mod/hmi.py	2021-05-01 13:32:12.026468288 +0100
-+++ mod/hmi.py	2021-05-01 13:32:03.720124915 +0100
-@@ -58,36 +58,8 @@
- )
+--- mod/hmi.py.orig	2023-01-30 19:50:15.278394806 +0000
++++ mod/hmi.py	2023-01-30 19:51:06.987393716 +0000
+@@ -66,36 +66,8 @@
+ from mod.settings import LOG
  
  import logging
 -import serial
@@ -37,16 +37,18 @@
  class HMI(object):
      def __init__(self, port, baud_rate, timeout, init_cb, reinit_cb):
          self.sp = None
-@@ -115,414 +87,4 @@
+@@ -123,422 +95,4 @@
      # this can be overriden by subclasses to avoid any connection in DEV mode
      def init(self, callback):
          ioloop = IOLoop.instance()
 -        try:
 -            sp = None
+-            # pylint: disable=unexpected-keyword-arg
 -            try:
 -                sp = serial.Serial(self.port, self.baud_rate, timeout=0, write_timeout=0)
 -            except:
 -                sp = serial.Serial(self.port, self.baud_rate, timeout=0, writeTimeout=0)
+-            # pylint: enable=unexpected-keyword-arg
 -            sp.flushInput()
 -            sp.flushOutput()
 -        except Exception as e:
@@ -87,7 +89,6 @@
 -
 -        if data is not None and data != b'\0':
 -            self.last_write_time = 0
--            logging.debug('[hmi] received <- %s', data)
 -            try:
 -                msg = Protocol(data.decode("utf-8", errors="ignore"))
 -            except ProtocolError as e:
@@ -104,29 +105,39 @@
 -                if msg.is_resp():
 -                    try:
 -                        original_msg, callback, datatype = self.queue.pop(0)
--                        logging.debug("[hmi] popped from queue: %s", original_msg)
+-                        withlog = LOG >= 2 or (LOG and original_msg not in ("pi",))
+-                        if withlog:
+-                            logging.debug('[hmi] received response <- %s', data)
+-                            logging.debug("[hmi] popped from queue: %s | %s",
+-                                          original_msg, cmd_to_str(original_msg.split(" ",1)[0]))
 -                    except IndexError:
 -                        # something is wrong / not synced!!
--                        logging.error("[hmi] NOT SYNCED")
+-                        logging.error("[hmi] NOT SYNCED after receiving %s", data)
 -                    else:
 -                        if callback is not None:
--                            logging.debug("[hmi] calling callback for %s", original_msg)
+-                            if withlog:
+-                                logging.debug("[hmi] calling callback for %s", original_msg)
 -                            callback(msg.process_resp(datatype))
 -                        self.process_queue()
 -                else:
 -                    def _callback(resp, resp_args=None):
--                        resp = 0 if resp else -1
+-                        if not isinstance(resp, int):
+-                            resp = 0 if resp else -1
 -                        if resp_args is None:
 -                            self.send_reply("%s %d" % (CMD_RESPONSE, resp))
--                            logging.debug('[hmi]     sent "%s %s"', CMD_RESPONSE, resp)
+-                            logging.debug('[hmi]     sent "%s %d"', CMD_RESPONSE, resp)
 -
 -                        else:
 -                            self.send_reply("%s %d %s" % (CMD_RESPONSE, resp, resp_args))
--                            logging.debug('[hmi]     sent "%s %s %s"', CMD_RESPONSE, resp, resp_args)
+-                            logging.debug('[hmi]     sent "%s %d %s"', CMD_RESPONSE, resp, resp_args)
 -
 -                        self.handling_response = False
 -                        if self.queue_idle:
 -                            self.process_queue()
+-
+-                    if LOG >= 1:
+-                        logging.debug('[hmi] received <- %s | %s', data,
+-                                      cmd_to_str((data.split(b' ',1)[0] if b' ' in data else data[:-1]).decode("utf-8", errors="ignore")))
 -
 -                    self.handling_response = True
 -                    msg.run_cmd(_callback)
@@ -178,11 +189,13 @@
 -        try:
 -            msg, callback, datatype = self.queue[0] # fist msg on the queue
 -        except IndexError:
--            logging.debug("[hmi] queue is empty, nothing to do")
+-            if LOG >= 2:
+-                logging.debug("[hmi] queue is empty, nothing to do")
 -            self.queue_idle = True
 -            self.last_write_time = 0
 -        else:
--            logging.debug("[hmi] sending -> %s", msg)
+-            if LOG >= 2 or (LOG and msg not in ("pi",)):
+-                logging.debug("[hmi] sending -> %s | %s", msg, cmd_to_str(msg.split(" ",1)[0]))
 -            try:
 -                self.sp.write(msg.encode('utf-8') + b'\0')
 -            except StreamClosedError as e:
@@ -219,7 +232,8 @@
 -                    #callback(True)
 -            #else:
 -            self.queue.append((msg, callback, datatype))
--            logging.debug("[hmi] scheduling -> %s", msg)
+-            if LOG >= 2 or (LOG and msg not in ("pi",)):
+-                logging.debug("[hmi] scheduling -> %s | %s", msg, cmd_to_str(msg.split(" ",1)[0]))
 -            if self.queue_idle and not self.handling_response:
 -                self.process_queue()
 -            return
@@ -233,24 +247,8 @@
 -
 -        self.sp.write(msg.encode('utf-8') + b'\0')
 -
--    def initial_state(self, bank_id, pedalboard_id, pedalboards, callback):
--        numPedals = len(pedalboards)
--
--        if numPedals <= 9 or pedalboard_id < 4:
--            startIndex = 0
--        elif pedalboard_id+4 >= numPedals:
--            startIndex = numPedals - 9
--        else:
--            startIndex = pedalboard_id - 4
--
--        endIndex = min(startIndex+9, numPedals)
--
--        data = '%s %d %d %d %d %d' % (CMD_INITIAL_STATE, numPedals, startIndex, endIndex, bank_id, pedalboard_id)
--
--        for i in range(startIndex, endIndex):
--            data += ' "%s" %d' % (pedalboards[i]['title'].replace('"', '')[:31].upper(), i+1)
--
--        self.send(data, callback)
+-    def initial_state(self, data, callback):
+-        self.send('{} {}'.format(CMD_INITIAL_STATE, data), callback)
 -
 -    def ui_con(self, callback):
 -        self.send(CMD_GUI_CONNECTED, callback, 'boolean')
@@ -272,15 +270,15 @@
 -        options = data['options']
 -        hmi_set_index = self.hw_desc.get('hmi_set_index', False)
 -
--        if data.get('group', None) is not None:
+-        if data.get('group', None) is not None and self.hw_desc.get('hmi_actuator_group_prefix', True):
 -            if var_type & FLAG_CONTROL_REVERSE:
 -                prefix = "- "
 -            else:
 -                prefix = "+ "
 -            label = prefix + label
 -
--        label = '"%s"' % label.replace('"', "")[:31].upper()
--        unit = '"%s"' % unit.replace('"', '')[:7]
+-        label = normalize_for_hw(label)
+-        unit = normalize_for_hw(unit, 7)
 -
 -        if value < xmin:
 -            logging.error('[hmi] control_add received value < min for %s', label)
@@ -318,15 +316,18 @@
 -            if data.get('coloured', False):
 -                flags |= FLAG_PAGINATION_ALT_LED_COLOR
 -
+-            data['steps'] = steps = numOpts - 1
+-
 -            for i in range(startIndex, endIndex):
 -                option = options[i]
--                xdata  = '"%s" %f' % (option[1].replace('"', '')[:31].upper(), float(option[0]))
+-                xdata  = '%s %f' % (normalize_for_hw(option[1]), float(option[0]))
 -                optionsData.append(xdata)
 -
 -            options = "%d %d %d %s" % (len(optionsData), flags, ivalue, " ".join(optionsData))
 -            options = options.strip()
 -
 -        else:
+-            flags = 0x0
 -            options = "0"
 -
 -        def control_add_callback(ok):
@@ -337,11 +338,11 @@
 -            index = data['addrs_idx']
 -            self.control_set_index(hw_id, index, n_controllers, callback)
 -
--        cb = callback
--
 -        # FIXME this should be based on hw desc "max_assigns" instead of hardcoded
 -        if not actuator_uri.startswith("/hmi/footswitch") and hmi_set_index:
 -            cb = control_add_callback
+-        else:
+-            cb = callback
 -
 -        self.send('%s %d %s %d %s %f %f %f %d %s' %
 -                  ( CMD_CONTROL_ADD,
@@ -370,10 +371,7 @@
 -        removes an addressing
 -        """
 -
--        idsStr = tuple(str(i) for i in hw_ids)
--
--        ids = "%s" % (" ".join(idsStr))
--        ids = ids.strip()
+-        ids = " ".join(str(i) for i in hw_ids).strip()
 -        self.send('%s %s' % (CMD_CONTROL_REMOVE, ids), callback, 'boolean')
 -
 -    def ping(self, callback):
@@ -381,6 +379,10 @@
 -
 -    def tuner(self, freq, note, cents, callback):
 -        self.send('%s %f %s %f' % (CMD_TUNER, freq, note, cents), callback)
+-
+-    #TODO, This message should be handled by mod-system-control once in place
+-    def expression_overcurrent(self, callback):
+-        self.send(CMD_DUOX_EXP_OVERCURRENT, callback, 'boolean')
 -
 -    def bank_config(self, hw_id, action, callback):
 -        """
@@ -443,13 +445,19 @@
 -    def reset_eeprom(self, callback=None, datatype='int'):
 -        self.send(CMD_RESET_EEPROM, callback, datatype)
 -
+-    def screenshot(self, screen, callback=None, datatype='int'):
+-        self.send('{} {} ignored'.format(CMD_SCREENSHOT, screen), callback, datatype)
+-
 -    # FIXME this message should be generic, most likely
 -    def boot(self, bootdata, callback, datatype='int'):
 -        self.send("boot {}".format(bootdata), callback, datatype)
 -
--    def set_pedalboard_name(self, name, callback):
--        self.send('{} {}'.format(CMD_PEDALBOARD_NAME_SET, name[:31].upper()), callback)
+-    def set_pedalboard_index(self, index, callback):
+-        self.send('{} {}'.format(CMD_PEDALBOARD_CHANGE, index), callback)
 -
--    def set_snapshot_name(self, name, callback):
--        self.send('{} {}'.format(CMD_SNAPSHOT_NAME_SET, name[:31].upper()), callback)
+-    def set_pedalboard_name(self, name, callback):
+-        self.send('{} {}'.format(CMD_PEDALBOARD_NAME_SET, normalize_for_hw(name)), callback)
+-
+-    def set_snapshot_name(self, index, name, callback):
+-        self.send('{} {} {}'.format(CMD_SNAPSHOT_NAME_SET, index, normalize_for_hw(name)), callback)
 +        return
