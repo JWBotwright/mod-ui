@@ -9,7 +9,7 @@
 +Exec=/usr/bin/mod-ui-launcher
 +Icon=mod
 +Type=Application
-+Terminal=true
++Terminal=false
 +StartupNotify=true
 +Categories=X-DAW;AudioVideo;Audio;X-Jack;Midi;X-MIDI;
 +Keywords=Audio;Sound;Guitar;Amplifier;Record;Midi;Jack;

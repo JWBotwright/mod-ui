@@ -2,7 +2,7 @@
 
 # Slackware build script for mod-ui
 
-# Copyright 2017-2020 Benjamin Trigona-Harany
+# Copyright 2022 Moley
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -74,7 +74,7 @@ cd $TMP
 rm -rf $SRCNAM-$VERSION
 tar xvf $CWD/$SRCNAM-$VERSION.tar.gz
 cd $SRCNAM-$VERSION
-#chown -R root:root .
+[ `id -u` -eq 0 ] && chown -R root:root .
 find -L . \
  \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
   -o -perm 511 \) -exec chmod 755 {} \; -o \
@@ -95,7 +95,7 @@ make -C utils
 PYTHON=$(readlink -f $(which python3))
 PYDIR=usr/lib64/${PYTHON##*/}/site-packages/$PRGNAM
 
-sed -i 's#\$PYDIR#/'$PYDIR'#' mod-ui.sh
+sed -i 's#\$PYDIR#/'$PYDIR'#' mod-ui-launcher
 
 mkdir -p $PKG/$PYDIR
 cp -a html mod modtools server.py $PKG/$PYDIR/
@@ -105,7 +105,7 @@ mkdir -p $PKG/usr/bin
 cp -a mod-ui-launcher $PKG/usr/bin/
 chmod 755 $PKG/usr/bin/mod-ui-launcher
 mkdir -p $PKG/usr/share/pixmaps
-cp -a mod.png $PKG/usr/share/pixmaps/
+cp -a html/img/icons/36/mod.png $PKG/usr/share/pixmaps/
 mkdir -p $PKG/usr/share/applications
 cp -a mod-ui.desktop $PKG/usr/share/applications/
 

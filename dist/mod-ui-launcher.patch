@@ -107,7 +107,7 @@
 +echo -n "Starting modui ... "
 +export MOD_DEV_ENVIRONMENT=0
 +export MOD_LOG=0
-+python3 /usr/lib64/python3.9/site-packages/mod-ui/server.py >/dev/null 2>&1 &
++python3 $PYDIR/server.py >/dev/null 2>&1 &
 +PID=$!
 +sleep 3
 +kill -0 $PID 2>/dev/null
