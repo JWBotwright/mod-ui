@@ -81,18 +81,19 @@ find -L . \
  \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
-patch -p0 < $CWD/mod-ui-sh.patch
 patch -p0 < $CWD/mod-ui-mod-hmi.patch
 #echo "patching file mod/hmi.py"
 #sed -i '1,/def init/!d;n;n;d;' mod/hmi.py
 #sed -i '$a\        return' mod/hmi.py
 patch -p0 < $CWD/mod-ui-server.patch
 patch -p0 < $CWD/mod-ui-html-index.patch
+patch -p0 < $CWD/mod-ui-launcher.patch
+patch -p0 < $CWD/mod-ui-desktop.patch
 
 make -C utils
 
 PYTHON=$(readlink -f $(which python3))
-PYDIR=opt/lib64/${PYTHON##*/}/site-packages/$PRGNAM
+PYDIR=usr/lib64/${PYTHON##*/}/site-packages/$PRGNAM
 
 sed -i 's#\$PYDIR#/'$PYDIR'#' mod-ui.sh
 
@@ -100,9 +101,13 @@ mkdir -p $PKG/$PYDIR
 cp -a html mod modtools server.py $PKG/$PYDIR/
 mkdir -p $PKG/$PYDIR/utils
 cp -a utils/libmod_utils.so $PKG/$PYDIR/utils/
-mkdir -p $PKG/opt/bin
-cp -a mod-ui.sh $PKG/opt/bin/
-chmod 755 $PKG/opt/bin/mod-ui.sh
+mkdir -p $PKG/usr/bin
+cp -a mod-ui-launcher $PKG/usr/bin/
+chmod 755 $PKG/usr/bin/mod-ui-launcher
+mkdir -p $PKG/usr/share/pixmaps
+cp -a mod.png $PKG/usr/share/pixmaps/
+mkdir -p $PKG/usr/share/applications
+cp -a mod-ui.desktop $PKG/usr/share/applications/
 
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true

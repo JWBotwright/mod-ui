@@ -1,0 +1,15 @@
+--- mod-ui.desktop	2023-02-23 18:42:10.074000112 +0000
++++ mod-ui.desktop	2023-03-02 12:57:12.962041818 +0000
+@@ -0,0 +1,12 @@
++[Desktop Entry]
++Name=mod-ui
++GenericName=mod-devices UI
++Version=1.0
++Comment=virtual pedalboard
++Exec=/usr/bin/mod-ui-launcher
++Icon=mod
++Type=Application
++Terminal=true
++StartupNotify=true
++Categories=X-DAW;AudioVideo;Audio;X-Jack;Midi;X-MIDI;
++Keywords=Audio;Sound;Guitar;Amplifier;Record;Midi;Jack;

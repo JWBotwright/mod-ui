@@ -31,7 +31,6 @@ keys/serial
 html/pedalboards/*.png
 modui-env/
 build/
-dist/
 utils/test
 *.orig
 *node_modules/
