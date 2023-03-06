@@ -1,0 +1,38 @@
+--- mod-ui-launcher.1	2023-03-06 06:21:35.109999773 +0000
++++ mod-ui-launcher.1	2023-03-06 08:16:14.751261661 +0000
+@@ -0,0 +1,35 @@
++.TH mod\-ui\-launcher 1 2023-03-01 mod-ui "The mod-ui web interface"
++.SH About
++.PP
++mod\-ui\-launcher is an utility script which launches all the required daemons for the
++mod-devices mod-ui interface
++.PP
++Currently the launcher will:
++.RS
++.IP \(bu 2
++Open a progress dialog
++.IP \(bu 2
++Start jackd using the arguments found in $JACKD_ARGS, or typical arguments if $JACKD_ARGS
++is empty
++.IP \(bu 2
++Start mod-host with typical arguments
++.IP \(bu 2
++jack_load mod-monitor
++.IP \(bu 2
++Start the mod-ui webserver on port 8888
++.IP \(bu 2
++Open your preferred web browser to http://localhost:8888
++.RE
++.PP
++mod\-ui\-launcher is part of the MOD audio project
++\[la]https://mod.audio/about\[ra]\&.
++.SH Features
++.PP
++mod\-ui\-launcher has very basic error checking and will tear down all its own daemons
++upon exit.
++This was chosen in preference to checking whether jackd or mod-host are already running
++to let you easier start from a blank slate when testing your $JACKD_ARGS.
++.SH "SEE ALSO"
++.IX Header "SEE ALSO"
++\&\fBmod-host\fR\|(1),
++\&\fBhttps://mod.audio/about\fR\|

@@ -1,6 +1,6 @@
---- mod-ui-launcher	2023-02-23 18:42:10.074000112 +0000
-+++ mod-ui-launcher	2023-03-02 12:46:36.737007397 +0000
-@@ -0,0 +1,134 @@
+--- mod-ui-launcher	2023-03-06 06:21:35.109999773 +0000
++++ mod-ui-launcher	2023-03-06 08:23:35.629214360 +0000
+@@ -0,0 +1,135 @@
 +#!/bin/bash
 +
 +# Copy this to your .bash_profile and amend JACKD_ARGS for your setup
@@ -11,7 +11,7 @@
 +#   export JACKD_ARGS="-R -d alsa -p 128 -n 1 -r 48000 -d hw:0"
 +# else
 +#   # Start jackd under non-RT kernel
-+#   export JACKD_ARGS="-r -d alsa -p 128 -n 2 -r 48000 -d hw:0"
++#   export JACKD_ARGS="-r -d alsa -p 256 -n 2 -r 48000 -d hw:0"
 +# fi
 +
 +kill_daemons () {
@@ -39,6 +39,7 @@
 +    kill $JACKD_PID 2>/dev/null
 +    echo "DONE"
 +  fi
++  qdbus $msgbox close
 +}
 +
 +# Register a trap to stop the daemons.
@@ -59,7 +60,7 @@
 +then
 +  if [ -z "$JACKD_ARGS" ]
 +  then
-+    JACKD_ARGS="-R -d alsa -p 128 -n 1 -r 48000 -D"
++    JACKD_ARGS="-R -d alsa -p 256 -n 1 -r 48000"
 +  fi
 +  echo -n "Starting jackd ... "
 +  jackd $JACKD_ARGS -D -n mod >/dev/null 2>&1 &

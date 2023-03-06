@@ -88,6 +88,7 @@ patch -p0 < $CWD/mod-ui-mod-hmi.patch
 patch -p0 < $CWD/mod-ui-server.patch
 patch -p0 < $CWD/mod-ui-html-index.patch
 patch -p0 < $CWD/mod-ui-launcher.patch
+patch -p0 < $CWD/mod-ui-man.patch
 patch -p0 < $CWD/mod-ui-desktop.patch
 
 make -C utils
@@ -104,6 +105,9 @@ cp -a utils/libmod_utils.so $PKG/$PYDIR/utils/
 mkdir -p $PKG/usr/bin
 cp -a mod-ui-launcher $PKG/usr/bin/
 chmod 755 $PKG/usr/bin/mod-ui-launcher
+mkdir -p $PKG/usr/share/man/man1
+gzip -9 mod-ui-launcher.1
+cp -a mod-ui-launcher.1.gz $PKG/usr/share/man/man1/
 mkdir -p $PKG/usr/share/pixmaps
 cp -a html/img/icons/36/mod.png $PKG/usr/share/pixmaps/
 mkdir -p $PKG/usr/share/applications
