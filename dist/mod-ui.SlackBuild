@@ -90,6 +90,7 @@ patch -p0 < $CWD/mod-ui-html-index.patch
 patch -p0 < $CWD/mod-ui-launcher.patch
 patch -p0 < $CWD/mod-ui-man.patch
 patch -p0 < $CWD/mod-ui-desktop.patch
+patch -p0 < $CWD/mod-ui-webserver.patch
 
 make -C utils
 
