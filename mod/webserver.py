@@ -2169,6 +2169,9 @@ class FilesList(JsonRequestHandler):
         elif filetype == "aidadspmodel":
             return ("Aida DSP Models", (".json",))
 
+        elif filetype == "nammodel":
+            return ("Amp Models", (".nam",))
+
         else:
             return (None, ())
 
