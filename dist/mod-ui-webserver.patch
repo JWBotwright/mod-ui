@@ -1,6 +1,6 @@
---- mod/webserver.py
-+++ mod/webserver.py
-@ -2170,6 +2169,9 @@ class FilesList(JsonRequestHandler):
+--- mod/webserver.py	2021-05-02 15:27:43.557101894 +0100
++++ mod/webserver.py	2021-05-02 15:27:43.557101894 +0100
+@@ -2170,6 +2169,9 @@ class FilesList(JsonRequestHandler):
          elif filetype == "aidadspmodel":
              return ("Aida DSP Models", (".json",))
  
