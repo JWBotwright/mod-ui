@@ -121,18 +121,18 @@ mkdir -p $PKG/usr/share/pixmaps
 cp -a html/img/icons/36/mod.png $PKG/usr/share/pixmaps/
 mkdir -p $PKG/usr/share/applications
 cp -a mod-ui.desktop $PKG/usr/share/applications/
-mkdir -p $PKG/usr/share/mod/default-user-files/Speaker Cabinets IRs
-mkdir -p $PKG/usr/share/mod/default-user-files/Hydrogen Drumkits
-mkdir -p $PKG/usr/share/mod/default-user-files/Audio Loops
-mkdir -p $PKG/usr/share/mod/default-user-files/Audio Recordings
-mkdir -p $PKG/usr/share/mod/default-user-files/Audio Samples
-mkdir -p $PKG/usr/share/mod/default-user-files/Audio Tracks
-mkdir -p $PKG/usr/share/mod/default-user-files/MIDI Clips
-mkdir -p $PKG/usr/share/mod/default-user-files/MIDI Songs
-mkdir -p $PKG/usr/share/mod/default-user-files/Reverb IRs
-mkdir -p $PKG/usr/share/mod/default-user-files/SF2 Instruments
-mkdir -p $PKG/usr/share/mod/default-user-files/SFZ Instruments
-mkdir -p $PKG/usr/share/mod/default-user-files/Amp Models
+mkdir -p "$PKG/usr/share/mod/default-user-files/Speaker Cabinets IRs"
+mkdir -p "$PKG/usr/share/mod/default-user-files/Hydrogen Drumkits"
+mkdir -p "$PKG/usr/share/mod/default-user-files/Audio Loops"
+mkdir -p "$PKG/usr/share/mod/default-user-files/Audio Recordings"
+mkdir -p "$PKG/usr/share/mod/default-user-files/Audio Samples"
+mkdir -p "$PKG/usr/share/mod/default-user-files/Audio Tracks"
+mkdir -p "$PKG/usr/share/mod/default-user-files/MIDI Clips"
+mkdir -p "$PKG/usr/share/mod/default-user-files/MIDI Songs"
+mkdir -p "$PKG/usr/share/mod/default-user-files/Reverb IRs"
+mkdir -p "$PKG/usr/share/mod/default-user-files/SF2 Instruments"
+mkdir -p "$PKG/usr/share/mod/default-user-files/SFZ Instruments"
+mkdir -p "$PKG/usr/share/mod/default-user-files/Amp Models"
 
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
