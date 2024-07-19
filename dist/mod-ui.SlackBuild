@@ -85,12 +85,20 @@ patch -p0 < $CWD/mod-ui-mod-hmi.patch
 #echo "patching file mod/hmi.py"
 #sed -i '1,/def init/!d;n;n;d;' mod/hmi.py
 #sed -i '$a\        return' mod/hmi.py
+echo "Patching mod-ui-server"
 patch -p0 < $CWD/mod-ui-server.patch
+echo "Patching mod-ui-html-index"
 patch -p0 < $CWD/mod-ui-html-index.patch
+echo "Patching mod-ui-launcher"
 patch -p0 < $CWD/mod-ui-launcher.patch
+echo "Patching mod-ui-man"
 patch -p0 < $CWD/mod-ui-man.patch
+echo "Patching mod-ui-desktop"
 patch -p0 < $CWD/mod-ui-desktop.patch
+echo "Patching mod-ui-webserver"
 patch -p0 < $CWD/mod-ui-webserver.patch
+echo "Patching mod-ui-mod-settings"
+patch -p0 < $CWD/mod-ui-mod-settings.patch
 
 make -C utils
 
@@ -113,6 +121,18 @@ mkdir -p $PKG/usr/share/pixmaps
 cp -a html/img/icons/36/mod.png $PKG/usr/share/pixmaps/
 mkdir -p $PKG/usr/share/applications
 cp -a mod-ui.desktop $PKG/usr/share/applications/
+mkdir -p $PKG/usr/share/mod/default-user-files/Speaker Cabinets IRs
+mkdir -p $PKG/usr/share/mod/default-user-files/Hydrogen Drumkits
+mkdir -p $PKG/usr/share/mod/default-user-files/Audio Loops
+mkdir -p $PKG/usr/share/mod/default-user-files/Audio Recordings
+mkdir -p $PKG/usr/share/mod/default-user-files/Audio Samples
+mkdir -p $PKG/usr/share/mod/default-user-files/Audio Tracks
+mkdir -p $PKG/usr/share/mod/default-user-files/MIDI Clips
+mkdir -p $PKG/usr/share/mod/default-user-files/MIDI Songs
+mkdir -p $PKG/usr/share/mod/default-user-files/Reverb IRs
+mkdir -p $PKG/usr/share/mod/default-user-files/SF2 Instruments
+mkdir -p $PKG/usr/share/mod/default-user-files/SFZ Instruments
+mkdir -p $PKG/usr/share/mod/default-user-files/Amp Models
 
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
